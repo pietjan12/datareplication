@@ -1,0 +1,15 @@
+kubectl run -n mysql mysql-client --image=mysql:5.7 -i --rm --restart=Never --  mysql -h mysql-0.mysql <<EOF
+CREATE DATABASE test;
+CREATE TABLE test.messages (message VARCHAR(250));
+INSERT INTO test.messages VALUES ('hello');
+EOF
+
+kubectl run -n mysql mysql-client --image=mysql:5.7 -i -t --rm --restart=Never --  mysql -h mysql-read -e "SELECT * FROM test.messages"
+
+
+IN POWERSHELL WANT WINDOWS MEMES (-it werkt beter op powershell) -> zie https://stackoverflow.com/questions/43099116/error-the-input-device-is-not-a-tty
+kubectl run -n mysql mysql-client-loop --image=mysql:5.7 -i -t --rm --restart=Never -- bash -ic "while sleep 1; do mysql -h mysql-read -e 'SELECT @@server_id,NOW(), t.message FROM test.messages t'; done"
+
+
+indien windows me nog hard cuckt:
+kubectl get logs pod/mysql-client-loop -n mysql
